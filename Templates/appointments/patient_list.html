@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}List of Patients{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 page-bg">
+    <div class="container">
+        <h2 class="mb-2 text-center text-white">👩‍⚕️ List of Patients</h2>
+        <p class="text-center text-light">
+            Showing <span id="patientCount">{{ patients|length }}</span> Patients
+        </p>
+
+        <!-- Search & Filter Controls -->
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-5 mb-2">
+                <input type="text" id="searchInput" class="form-control shadow-sm"
+                       placeholder="🔍 Search patients by name...">
+            </div>
+            <div class="col-md-3 mb-2">
+                <select id="statusFilter" class="form-select shadow-sm">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="new">New</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Patient Cards -->
+        <div class="row" id="patientsContainer">
+            {% for patient in patients %}
+            <div class="col-md-4 mb-4 patient-card-wrapper"
+                 data-name="{{ patient.name|lower }}"
+                 data-status="{{ patient.status|default:'unknown' }}">
+                <a href="{% url 'appointments:patient_detail' patient.id %}" class="text-decoration-none">
+                    <div class="card patient-card shadow-lg border-0">
+
+                        <!-- Status Badge -->
+                        <div class="status-badge">
+                            {% if patient.status == "active" %}
+                                <span class="badge bg-success">Active</span>
+                            {% elif patient.status == "new" %}
+                                <span class="badge bg-warning text-dark">New</span>
+                            {% elif patient.status == "inactive" %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Unknown</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body text-center">
+                            <!-- Avatar Circle -->
+                            <div class="avatar-circle mb-3">
+                                {{ patient.name|first }}
+                            </div>
+
+                            <!-- Name -->
+                            <h5 class="card-title text-dark">{{ patient.name }}</h5>
+
+                            <!-- Phone -->
+                            <p class="text-muted">
+                                <i class="bi bi-telephone-fill text-primary"></i>
+                                {{ patient.phone_number|default:"Not Provided" }}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'appointments:dashboard_dark' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Styling -->
+<style>
+/* Page Background */
+.page-bg {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    min-height: 100vh;
+}
+
+<!--.page-bg {-->
+<!--    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);-->
+<!--    min-height: 100vh;-->
+<!--}-->
+
+
+/* Patient Card */
+.patient-card {
+    border-radius: 18px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+}
+.patient-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+/* Status Badge */
+.status-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+/* Avatar Circle */
+.avatar-circle {
+    width: 75px;
+    height: 75px;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+/* Input & Select */
+input.form-control, select.form-select {
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* Back Button */
+.btn-light {
+    border-radius: 12px;
+    font-weight: bold;
+}
+</style>
+
+<!-- Search & Filter Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const patients = document.querySelectorAll(".patient-card-wrapper");
+    const patientCount = document.getElementById("patientCount");
+
+    function filterPatients() {
+        const searchText = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        let visibleCount = 0;
+
+        patients.forEach(card => {
+            const name = card.dataset.name;
+            const cardStatus = card.dataset.status.toLowerCase();
+
+            const matchesSearch = name.includes(searchText);
+            const matchesStatus = (status === "all" || status === cardStatus);
+
+            if (matchesSearch && matchesStatus) {
+                card.style.display = "block";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        patientCount.textContent = visibleCount;
+    }
+
+    searchInput.addEventListener("input", filterPatients);
+    statusFilter.addEventListener("change", filterPatients);
+});
+</script>
+{% endblock %}

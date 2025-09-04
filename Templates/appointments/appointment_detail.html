@@ -1,0 +1,33 @@
+
+{% extends "base.html" %}
+
+{% block title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header text-white bg-primary">
+        <h4 class="mb-0">Appointment Details</h4>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ appointment.patient_name }}'s Appointment</h5>
+        <h6 class="card-subtitle mb-3 text-muted">Appointment ID: {{ appointment.pk }}</h6>
+        <hr>
+        <p class="card-text">
+          <strong>Doctor:</strong> {{ appointment.doctor_name }}
+        </p>
+        <p class="card-text">
+          <strong>Date:</strong> {{ appointment.start_time|date:"F j, Y" }}
+        </p>
+        <p class="card-text">
+          <strong>Time:</strong> {{ appointment.start_time|time:"g:i a" }} - {{ appointment.end_time|time:"g:i a" }}
+        </p>
+      </div>
+      <div class="card-footer text-end">
+        <a href="{% url 'appointments:appointment_list' %}" class="btn btn-secondary">Back to Appointments List</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

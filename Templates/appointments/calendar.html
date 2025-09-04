@@ -1,0 +1,128 @@
+{% extends "appointments/base.html" %}
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+<style>#calendar{max-width:1000px;margin:20px auto}</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Appointment Calendar</h2>
+<div id="calendar"></div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="bookForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Book Appointment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="selectedDate" name="selectedDate" />
+        <div class="mb-3">
+          <label>Doctor</label>
+          <select id="doctorSelect" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+          <label>Start time</label>
+          <input id="startInput" type="datetime-local" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label>End time</label>
+          <input id="endInput" type="datetime-local" class="form-control" required />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Book</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+      const cookie = c.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  const calendarEl = document.getElementById('calendar');
+  const bookModal = new bootstrap.Modal(document.getElementById('bookModal'));
+  const doctorSelect = document.getElementById('doctorSelect');
+  const startInput = document.getElementById('startInput');
+  const endInput = document.getElementById('endInput');
+  const bookForm = document.getElementById('bookForm');
+
+  // Load doctors into select
+  async function loadDoctors() {
+    const res = await fetch('/appointments/api/doctors/', {credentials:'same-origin'});
+    const data = await res.json();
+    doctorSelect.innerHTML = data.map(d => `<option value="${d.id}">${d.user_name} (${d.id})</option>`).join('');
+  }
+  await loadDoctors();
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    selectable: true,
+    events: function(fetchInfo, successCallback) {
+      fetch('/appointments/api/appointments/patient/', {credentials:'same-origin'})
+        .then(r => r.json())
+        .then(events => successCallback(events))
+        .catch(e => { console.error(e); successCallback([]); });
+    },
+    select: function(info) {
+      // prefill modal: give start and end with time controls
+      const startISO = info.startStr.slice(0,16); // YYYY-MM-DDTHH:MM
+      const endISO = info.endStr.slice(0,16);
+      startInput.value = startISO;
+      endInput.value = endISO;
+      bookModal.show();
+    },
+  });
+
+  calendar.render();
+
+  // Handle book form submit
+  bookForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const doctorId = doctorSelect.value;
+    const start_time = startInput.value; // must be YYYY-MM-DDTHH:MM
+    const end_time = endInput.value;
+    const payload = { doctor: parseInt(doctorId), start_time, end_time };
+
+    const csrftoken = getCookie('csrftoken');
+    const res = await fetch('/appointments/api/appointment/book/', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Booking failed: ' + (err.detail || JSON.stringify(err)));
+      return;
+    }
+    alert('Booked!');
+    bookModal.hide();
+    calendar.refetchEvents();
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Deletion{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Confirm Deletion</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Are you sure you want to delete the following appointment?</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><strong>Doctor:</strong> Dr. {{ appointment.doctor_name }}</li>
+                        <li class="list-group-item"><strong>Patient:</strong> {{ appointment.patient_name }}</li>
+                        <li class="list-group-item"><strong>Date & Time:</strong> {{ appointment.start_time|date:"M. j, Y, P" }}</li>
+                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <form method="post" action="{% url 'appointments:delete_appointment' appointment.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                        </form>
+                        <a href="{% url 'appointments:appointments_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

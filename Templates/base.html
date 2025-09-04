@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{% block title %}Hospital System{% endblock %}</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Your custom CSS -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #0d1117;
+            padding-top: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .nav-link {
+            color: #c9d1d9;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #21262d;
+            border-radius: 8px;
+        }
+        .content-wrapper {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        /* Messages fixed at top */
+        .alert-message {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4 class="px-3 mb-4"><span style="color: #58a6ff;">❤</span> MedCare</h4>
+        <a class="nav-link {% if request.resolver_match.url_name == 'appointments_list' %}active{% endif %}" href="{% url 'appointments:appointments_list' %}">
+            <i class="bi bi-calendar-event"></i> Appointments
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'doctor_list' %}active{% endif %}" href="{% url 'appointments:doctor_list' %}">
+            <i class="bi bi-calendar-event"></i> Doctors List
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'patient_list' %}active{% endif %}" href="{% url 'appointments:patient_list' %}">
+            <i class="bi bi-calendar-event"></i> Patients List
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}" href="{% url 'appointments:messages' %}">
+            <i class="bi bi-calendar-event"></i> Messages
+        </a>
+
+    </div>
+
+
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+   <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+      var alertEl = document.querySelector('.alert-message .alert');
+      if (alertEl) {
+        var bsAlert = new bootstrap.Alert(alertEl);
+        bsAlert.close();
+      }
+    }, 3000); // 3 seconds
+  });
+</script>
+
+</body>
+</html>

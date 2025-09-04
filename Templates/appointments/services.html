@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Services - Hospital System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Our Services</h2>
+
+  {% if services %}
+    <div class="list-group">
+      {% for service in services %}
+        <div class="list-group-item mb-3 shadow-sm rounded">
+          <h4 class="mb-2">{{ service.name }}</h4>
+          <p>{{ service.description }}</p>
+          <p><strong>Price:</strong> ${{ service.price|floatformat:2 }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No services available at the moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

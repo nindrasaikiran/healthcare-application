@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Details{% endblock %}
+
+{% block content %}
+  <h1>{{ patient.name }}</h1>
+  <p><strong>Phone:</strong> {{ patient.phone|default:"Not provided" }}</p>
+  <p><strong>Date of Birth:</strong> {{ patient.date_of_birth|default:"Not provided" }}</p>
+  <p><strong>Address:</strong> {{ patient.address|default:"Not provided" }}</p>
+
+  <a href="{% url 'appointments:patient_list' %}" class="btn btn-secondary">Back to Patient List</a>
+{% endblock %}

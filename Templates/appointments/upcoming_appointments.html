@@ -1,0 +1,31 @@
+<h2>Upcoming Appointments</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.patient_name }}</td>
+                <td>{{ appointment.doctor_name }}</td>
+                <td>{{ appointment.start_time|date:"d-m-Y h:i A" }}</td>
+                <td>
+                    {% if appointment.status == 0 %} Requested
+                    {% elif appointment.status == 1 %} Scheduled
+                    {% elif appointment.status == 2 %} Completed
+                    {% elif appointment.status == 3 %} Cancelled
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No upcoming appointments</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Pharmacy List{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>💊 Pharmacy</h2>
+
+  <div class="mb-3">
+    <label>Filter by Category:</label>
+    <select id="categoryFilter" class="form-select">
+      <option value="">All</option>
+      {% for key, value in categories %}
+      <option value="{{ key }}">{{ value }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="row" id="medicationsContainer">
+    {% for med in medications %}
+    <div class="col-md-4 mb-3 medication-card" data-category="{{ med.category }}">
+      <div class="card shadow-sm">
+        {% if med.image %}
+        <img src="{{ med.image.url }}" class="card-img-top" alt="{{ med.name }}">
+        {% else %}
+        <img src="{% static 'default_medication.png' %}" class="card-img-top" alt="{{ med.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5>{{ med.name }}</h5>
+          <p>{{ med.category }}</p>
+          <p>{{ med.description }}</p>
+          <p><strong>₹{{ med.price }}</strong></p>
+          {% if med.prescription_required %}
+          <p class="text-danger">Prescription Required</p>
+          {% endif %}
+
+          <!-- Add to Cart redirects to Cart Page -->
+          <form method="post" action="{% url 'appointments:add_to_cart' med.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Add to Cart</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+<div class="text-center mt-4">
+            <a href="{% url 'appointments:dashboard_dark' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+
+  </div>
+</div>
+
+<script>
+  // Category filter script
+  document.getElementById('categoryFilter').addEventListener('change', function () {
+    const selected = this.value;
+    document.querySelectorAll('.medication-card').forEach(card => {
+      card.style.display = !selected || card.dataset.category === selected ? 'block' : 'none';
+    });
+  });
+</script>
+{% endblock %}

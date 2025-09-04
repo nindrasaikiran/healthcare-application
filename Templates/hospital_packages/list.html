@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Packages List{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <!-- Filter Buttons -->
+    <div class="text-center mb-4">
+        <button class="btn btn-outline-primary filter-btn active" data-type="all">All Packages</button>
+        <button class="btn btn-outline-info filter-btn" data-type="health_checkup">Health Check-up</button>
+        <button class="btn btn-outline-danger filter-btn" data-type="cancer_screening">Cancer Screening</button>
+        <button class="btn btn-outline-warning text-dark filter-btn" data-type="orthopedic">Orthopedic</button>
+        <button class="btn btn-outline-primary filter-btn" data-type="neurology">Neurology</button>
+        <button class="btn btn-outline-secondary filter-btn" data-type="child_care">Child Care</button>
+    </div>
+
+    <!-- Packages Grid -->
+    <div class="row g-4" id="package-grid">
+        {% for package in packages %}
+        <div class="col-12 col-md-6 col-lg-4 package-item" data-type="{{ package.package_type }}">
+            <div class="card h-100 shadow-sm border-0 package-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ package.name }}</h5>
+                    {% if package.special_offer %}
+                    <span class="badge bg-success">{{ package.special_offer }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <!-- Package Type Badge -->
+                    {% if package.package_type == 'health_checkup' %}
+                        <span class="badge bg-info mb-2"><i class="bi bi-heart-pulse me-1"></i>Health Check-up</span>
+                    {% elif package.package_type == 'cancer_screening' %}
+                        <span class="badge bg-danger mb-2"><i class="bi bi-bandaid me-1"></i>Cancer Screening</span>
+                    {% elif package.package_type == 'orthopedic' %}
+                        <span class="badge bg-warning text-dark mb-2"><i class="bi bi-file-medical me-1"></i>Orthopedic</span>
+                    {% elif package.package_type == 'neurology' %}
+                        <span class="badge bg-primary mb-2"><i class="bi bi-brain me-1"></i>Neurology</span>
+                    {% elif package.package_type == 'child_care' %}
+                        <span class="badge bg-secondary mb-2"><i class="bi bi-emoji-smile me-1"></i>Child Care</span>
+                    {% endif %}
+
+                    <p class="card-text">{{ package.description|truncatewords:25 }}</p>
+                    <p class="fw-bold mb-3"><i class="bi bi-currency-rupee me-1"></i>{{ package.price }}</p>
+                    <a href="{% url 'appointments:hospital_packages_detail' package.slug %}"
+                       class="btn btn-outline-primary mt-auto">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No packages available at the moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="text-center mt-5">
+        <a href="{% url 'appointments:dashboard_dark' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+            ⬅ Back to Dashboard
+        </a>
+    </div>
+
+</div>
+
+<!-- AJAX Filter Script -->
+<script>
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const packages = document.querySelectorAll('.package-item');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const type = btn.getAttribute('data-type');
+
+            packages.forEach(pkg => {
+                // Fade out
+                pkg.style.transition = "opacity 0.3s, transform 0.3s";
+                pkg.style.opacity = "0";
+                pkg.style.transform = "scale(0.95)";
+
+                setTimeout(() => {
+                    if(type === 'all' || pkg.dataset.type === type) {
+                        pkg.style.display = "block";
+                        pkg.style.opacity = "1";
+                        pkg.style.transform = "scale(1)";
+                    } else {
+                        pkg.style.display = "none";
+                    }
+                }, 200);
+            });
+        });
+    });
+</script>
+
+<!-- Optional CSS for hover effect -->
+<style>
+.package-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.package-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.filter-btn.active {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+</style>
+
+
+{% endblock %}

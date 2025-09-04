@@ -1,0 +1,16 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}Doctor Details{% endblock %}
+
+{% block content %}
+  <h1>Dr. {{ doctor.name }}</h1>
+  <p><strong>Specialization:</strong> {{ doctor.specialization }}</p>
+  <p><strong>Bio:</strong> {{ doctor.bio|default:"No bio available" }}</p>
+  <p><strong>Phone:</strong> {{ doctor.phone|default:"Not provided" }}</p>
+  <p><strong>Available From:</strong> {{ doctor.available_from }}</p>
+  <p><strong>Available To:</strong> {{ doctor.available_to }}</p>
+
+  <a href="{% url 'appointments:doctor_list' %}" class="btn btn-secondary">Back to Doctor List</a>
+{% endblock %}

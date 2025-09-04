@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Lab Tests List{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">🧪 Lab Tests</h2>
+  <div class="row">
+    {% for test in lab_tests %}
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ test.name }}</h5>
+          <p class="card-text">{{ test.description }}</p>
+          <a href="#" class="btn btn-primary">Book Now</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+      <div class="text-center mt-4">
+            <a href="{% url 'appointments:dashboard_dark' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+  </div>
+</div>
+{% endblock %}

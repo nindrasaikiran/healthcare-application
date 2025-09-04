@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Hospital Messages</h3>
+    <div id="messages-list" class="list-group">
+        {% for msg in messages %}
+            <div class="list-group-item {% if not msg.is_read %}fw-bold{% endif %}">
+                <h5>{{ msg.title }}</h5>
+                <p>{{ msg.message }}</p>
+                <small class="text-muted">{{ msg.category|title }} | {{ msg.created_at|date:"M d, Y H:i" }}</small>
+            </div>
+        {% empty %}
+            <p class="text-muted">No messages yet.</p>
+        {% endfor %}
+        <div class="text-center mt-4">
+            <a href="{% url 'appointments:dashboard' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+async function fetchMessages() {
+    const res = await fetch("{% url 'appointments:messages_api' %}");
+    const data = await res.json();
+
+    // Update unread count
+    document.getElementById("unread-count").innerText = data.count;
+
+    // If new messages, update list
+    if (data.messages.length > 0) {
+        let html = "";
+        data.messages.forEach(msg => {
+            html += `
+            <div class="list-group-item fw-bold">
+                <h5>${msg.title}</h5>
+                <p>${msg.message}</p>
+                <small class="text-muted">${msg.category} | ${msg.created_at}</small>
+            </div>`;
+        });
+        document.getElementById("messages-list").innerHTML = html;
+
+        // Show popup notification (like WhatsApp)
+        if (Notification.permission === "granted") {
+            new Notification("New Hospital Message", {
+                body: data.messages[0].message,
+                icon: "/static/images/hospital-icon.png" // optional
+            });
+        }
+    }
+}
+
+// Ask permission for browser notifications
+if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+
+// Refresh messages every 10 seconds
+setInterval(fetchMessages, 10000);
+</script>
+{% endblock %}

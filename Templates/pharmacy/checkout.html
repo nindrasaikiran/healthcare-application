@@ -1,0 +1,52 @@
+<!-- appointments/templates/appointments/checkout.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Checkout</h2>
+<ul>
+  {% for item in items %}
+  <li>{{ item.medication.name }} x {{ item.quantity }} = ₹{{ item.subtotal }}</li>
+  {% endfor %}
+</ul>
+<h4>Total: ₹{{ payment.amount }}</h4>
+
+<button id="rzp-button" class="btn btn-success">Pay with Razorpay</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "{{ RAZORPAY_KEY_ID }}",
+    "amount": "{{ payment.amount|floatformat:2|floatformat:0 }}" * 100,
+    "currency": "INR",
+    "name": "MedCare Pharmacy",
+    "description": "Purchase Medicines",
+    "order_id": "{{ payment.order_id }}",
+    "handler": function(response){
+        fetch("{% url 'appointments:payment_success' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                payment_id: response.razorpay_payment_id,
+                order_id: response.razorpay_order_id,
+                signature: response.razorpay_signature
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if(data.success){
+                window.location.href = "{% url 'appointments:pharmacy_list' %}";
+            }
+        });
+    },
+    "theme": {"color": "#3399cc"}
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+{% endblock %}

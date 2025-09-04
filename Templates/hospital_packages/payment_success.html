@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"><title>Payment Success</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head><body class="container py-5">
+  <div class="alert alert-success shadow">
+    <h4 class="alert-heading">Payment Successful 🎉</h4>
+    <p>Package: <strong>{{ booking.package.name }}</strong></p>
+    <p>Amount: ₹{{ booking.amount }}</p>
+    <p>Razorpay Payment ID: {{ booking.razorpay_payment_id }}</p>
+    <a class="btn btn-primary" href="{% url 'appointments:hospital_packages_list' %}">Back to Packages</a>
+  </div>
+</body></html>

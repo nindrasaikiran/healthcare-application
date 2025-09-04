@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}List of Doctors{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 page-bg">
+    <div class="container">
+        <h2 class="mb-2 text-center text-white">👨‍⚕️ List of Doctors</h2>
+        <p class="text-center text-light">
+            Showing <span id="doctorCount">{{ doctors|length }}</span> Doctors
+        </p>
+
+        <!-- Search & Filter Controls -->
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-5 mb-2">
+                <input type="text" id="searchInput" class="form-control shadow-sm"
+                       placeholder="🔍 Search doctors by name...">
+            </div>
+            <div class="col-md-3 mb-2">
+                <select id="specializationFilter" class="form-select shadow-sm">
+                    <option value="all">All Specializations</option>
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.specialization|lower }}">{{ doctor.specialization }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Doctor Cards -->
+        <div class="row" id="doctorsContainer">
+            {% for doctor in doctors %}
+            <div class="col-md-4 mb-4 doctor-card-wrapper"
+                 data-name="{{ doctor.name|lower }}"
+                 data-specialization="{{ doctor.specialization|lower }}">
+                <a href="{% url 'appointments:doctor_detail' doctor.id %}" class="text-decoration-none">
+                    <div class="card doctor-card shadow-lg border-0">
+
+                        <!-- Avatar Circle -->
+                        <div class="avatar-circle mb-3">
+                            {{ doctor.name|first }}
+                        </div>
+
+                        <div class="card-body text-center">
+                            <!-- Doctor Name -->
+                            <h5 class="card-title text-dark">Dr. {{ doctor.name }}</h5>
+
+                            <!-- Specialization -->
+                            <p class="fw-bold text-primary">
+                                {{ doctor.specialization }}
+                            </p>
+
+                            <!-- Bio -->
+                            <p class="text-muted">
+                                {{ doctor.bio|default:"No bio available" }}
+                            </p>
+
+                            <!-- Contact -->
+                            <p class="text-muted">
+                                <i class="bi bi-telephone-fill text-primary"></i>
+                                {{ doctor.phone|default:"Not Provided" }}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'appointments:dashboard_dark' %}" class="btn btn-light btn-lg shadow px-4 py-2">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Styling -->
+<style>
+/* Page Background */
+<!--.page-bg {-->
+<!--    background: linear-gradient(135deg, #232526 0%, #414345 100%);-->
+<!--    min-height: 100vh;-->
+<!--}-->
+
+.page-bg {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    min-height: 100vh;
+}
+
+
+
+
+/* Doctor Card */
+.doctor-card {
+    border-radius: 18px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+}
+.doctor-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+/* Avatar Circle */
+.avatar-circle {
+    width: 75px;
+    height: 75px;
+    background: linear-gradient(135deg, #36d1dc, #5b86e5);
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+/* Input & Select */
+input.form-control, select.form-select {
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* Back Button */
+.btn-light {
+    border-radius: 12px;
+    font-weight: bold;
+}
+</style>
+
+<!-- Search & Filter Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const specializationFilter = document.getElementById("specializationFilter");
+    const doctors = document.querySelectorAll(".doctor-card-wrapper");
+    const doctorCount = document.getElementById("doctorCount");
+
+    function filterDoctors() {
+        const searchText = searchInput.value.toLowerCase();
+        const specialization = specializationFilter.value;
+        let visibleCount = 0;
+
+        doctors.forEach(card => {
+            const name = card.dataset.name;
+            const cardSpecialization = card.dataset.specialization;
+
+            const matchesSearch = name.includes(searchText);
+            const matchesSpecialization = (specialization === "all" || specialization === cardSpecialization);
+
+            if (matchesSearch && matchesSpecialization) {
+                card.style.display = "block";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        doctorCount.textContent = visibleCount;
+    }
+
+    searchInput.addEventListener("input", filterDoctors);
+    specializationFilter.addEventListener("change", filterDoctors);
+});
+</script>
+{% endblock %}

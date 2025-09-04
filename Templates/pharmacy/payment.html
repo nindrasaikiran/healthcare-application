@@ -1,0 +1,16 @@
+<h3>Pay ₹{{ amount|floatformat:2 }}</h3>
+
+<form action="/payment/success/" method="POST">
+  <script
+    src="https://checkout.razorpay.com/v1/checkout.js"
+    data-key="{{ key }}"
+    data-amount="{{ amount }}"
+    data-currency="INR"
+    data-order_id="{{ order_id }}"
+    data-buttontext="Pay with Razorpay"
+    data-name="MedCare Pharmacy"
+    data-description="Medicine Purchase"
+    data-theme.color="#3399cc">
+  </script>
+  <input type="hidden" name="hidden">
+</form>
