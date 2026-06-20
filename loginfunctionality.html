@@ -1,1 +1,22 @@
-// this page includes login functionality
+  name="username"
+        [(ngModel)]="loginModel.username"
+        placeholder="Enter Username"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="loginModel.password"
+        placeholder="Enter Password"
+        required>
+    </div>
+
+    <button type="submit">Login</button>
+
+  </form>
+</div>
+
