@@ -1402,3 +1402,24 @@ def checkout(request):
 # def payment_failed(request, pk):
 #     payment = get_object_or_404(Payment, pk=pk, user=request.user)
 #     return render(request, "payments/failed.html", {"payment": payment})
+
+
+employees = []
+
+def create_employee():
+    id = int(input("Enter Employee Id: "))
+    name = input("Enter Employee Name: ")
+    department = input("Enter Department: ")
+
+    employee = {
+        "id": id,
+        "name": name,
+        "department": department
+    }
+
+    employees.append(employee)
+
+    print("Employee Added Successfully!")
+    print(employees)
+
+create_employee()
