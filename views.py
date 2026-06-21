@@ -961,6 +961,24 @@ def book_package(request, slug):
     }
     return render(request, "hospital_packages/package_payment.html", context)
 
+users = [
+    {"id": 1, "name": "Sai"},
+    {"id": 2, "name": "Kiran"},
+    {"id": 3, "name": "John"}
+]
+
+def delete_user(user_id):
+    global users
+
+    for user in users:
+        if user["id"] == user_id:
+            users.remove(user)
+            return f"User with ID {user_id} deleted successfully."
+
+    return f"User with ID {user_id} not found."
+print(delete_user(2))
+
+
 @csrf_exempt   # Razorpay posts to this URL
 def payment_handler(request):
     if request.method != "POST":
